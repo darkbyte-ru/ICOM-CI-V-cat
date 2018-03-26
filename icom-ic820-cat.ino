@@ -4,7 +4,6 @@ SoftwareSerial CAT(10, 11); // RX, TX
 
 #define DEBUG 1
 //#define MIRRORCAT 1
-//#define USELCD 1
 
 #define BROADCAST_ADDRESS    0x00 //Broadcast address
 #define CONTROLLER_ADDRESS   0xE0 //Controller address
