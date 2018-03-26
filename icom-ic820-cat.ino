@@ -20,6 +20,10 @@ SoftwareSerial CAT(10, 11); // RX, TX
 #define CMD_WRITE_FREQ       0x05 //Write operating frequency data
 #define CMD_WRITE_MODE       0x06 //Write operating mode data
 
+#define IF_PASSBAND_WIDTH_WIDE   0x01
+#define IF_PASSBAND_WIDTH_MEDIUM   0x02
+#define IF_PASSBAND_WIDTH_NARROW   0x03
+
 const uint32_t decMulti[]    = {1000000000, 100000000, 10000000, 1000000, 100000, 10000, 1000, 100, 10, 1};
 
 #define BAUD_RATES_SIZE 4
@@ -32,6 +36,12 @@ uint8_t  read_buffer[12];   //Read buffer
 uint32_t  frequency;        //Current frequency in Hz
 
 const char* mode[] = {"LSB","USB","AM","CW","FSK","FM","WFM"};
+#define MODE_TYPE_LSB   0x00
+#define MODE_TYPE_USB   0x01
+#define MODE_TYPE_AM    0x02
+#define MODE_TYPE_CW    0x03
+#define MODE_TYPE_RTTY  0x04
+#define MODE_TYPE_FM    0x05
 
 void configRadioBaud(uint16_t  baudrate)
 {
@@ -82,6 +92,25 @@ uint8_t readLine(void)
     if (counter >= sizeof(read_buffer))return 0;
   }
   return counter;
+}
+
+void radioSetMode(uint8_t modeid, uint8_t modewidth)
+{
+  uint8_t req[] = {START_BYTE, START_BYTE, radio_address, CONTROLLER_ADDRESS, CMD_WRITE_MODE, modeid, modewidth, STOP_BYTE};
+#ifdef DEBUG    
+  Serial.print(">");
+#endif
+  for (uint8_t i = 0; i < sizeof(req); i++) {
+    CAT.write(req[i]);
+#ifdef DEBUG    
+    if (req[i] < 16)Serial.print("0");
+    Serial.print(req[i], HEX);
+    Serial.print(" ");
+#endif
+  }
+#ifdef DEBUG    
+  Serial.println();
+#endif
 }
 
 void sendCatRequest(uint8_t requestCode)
@@ -257,9 +286,19 @@ void processCatMessages()
 #endif  
 }
 
+//unsigned long timer = 0;
+
 void loop()
 {
   processCatMessages();
+
+  /*
+  //every 10 seconds change modulation to CW (wide)
+  if(millis() - timer > 10000)
+  {
+    radioSetMode(MODE_TYPE_CW, IF_PASSBAND_WIDTH_WIDE);
+  }
+  */
 }
 
 
