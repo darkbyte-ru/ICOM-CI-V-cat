@@ -296,6 +296,7 @@ void loop()
   //every 10 seconds change modulation to CW (wide)
   if(millis() - timer > 10000)
   {
+    timer = millis(); 
     radioSetMode(MODE_TYPE_CW, IF_PASSBAND_WIDTH_WIDE);
   }
   */
